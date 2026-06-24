@@ -19,8 +19,12 @@ Future<Map<String, String>> format(
 }
 
 @override
-Future<Map<String, CountryWithPhoneCode>> getAllSupportedRegions() async {
-  return FlutterLibphonenumberPlatform.instance.getAllSupportedRegions();
+Future<Map<String, CountryWithPhoneCode>> getAllSupportedRegions({
+  final String? locale,
+}) async {
+  return FlutterLibphonenumberPlatform.instance.getAllSupportedRegions(
+    locale: locale,
+  );
 }
 
 @override

@@ -35,7 +35,7 @@ public class FlutterLibphonenumberPlugin : FlutterPlugin, MethodCallHandler {
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
     when (call.method) {
       "get_all_supported_regions" -> {
-        getAllSupportedRegions(result)
+        getAllSupportedRegions(call, result)
       }
       "parse" -> {
         parse(call, result)
@@ -76,9 +76,14 @@ public class FlutterLibphonenumberPlugin : FlutterPlugin, MethodCallHandler {
   }
 
   // Gathers all of the supported regions on another thread and sends them back to Dart when ready
-  private fun getAllSupportedRegions(result: Result) {
+  private fun getAllSupportedRegions(call: MethodCall, result: Result) {
     Thread(Runnable {
       val phoneUtil = PhoneNumberUtil.getInstance()
+      val localeTag = call.argument<String>("locale")
+      val displayLocale = localeTag
+        ?.takeIf { it.isNotBlank() }
+        ?.let { Locale.forLanguageTag(it.replace('_', '-')) }
+        ?: Locale.getDefault()
       val regionsMap = mutableMapOf<String, MutableMap<String, String>>()
       for (region in phoneUtil.supportedRegions) {
         val itemMap = mutableMapOf<String, String>()
@@ -99,7 +104,7 @@ public class FlutterLibphonenumberPlugin : FlutterPlugin, MethodCallHandler {
         itemMap["exampleNumberFixedLineInternational"] = fixedLineInternational
         itemMap["phoneMaskMobileInternational"] = maskNumber(mobileInternational)
         itemMap["phoneMaskFixedLineInternational"] = maskNumber(fixedLineInternational)
-        itemMap["countryName"] = Locale("",region).displayCountry
+        itemMap["countryName"] = Locale("", region).getDisplayCountry(displayLocale)
 
         // Save this map into the return map
         regionsMap[region] = itemMap
@@ -188,4 +193,3 @@ public class FlutterLibphonenumberPlugin : FlutterPlugin, MethodCallHandler {
     }
   }
 }
-

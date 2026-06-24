@@ -12,7 +12,8 @@ abstract class FlutterLibphonenumberPlatform extends PlatformInterface {
 
   static final Object _token = Object();
 
-  static FlutterLibphonenumberPlatform _instance = MethodChannelFlutterLibphonenumber();
+  static FlutterLibphonenumberPlatform _instance =
+      MethodChannelFlutterLibphonenumber();
 
   /// The default instance of [FlutterLibphonenumberPlatform] to use.
   ///
@@ -29,6 +30,10 @@ abstract class FlutterLibphonenumberPlatform extends PlatformInterface {
 
   /// Return all available regions with their country code, phone code, and formatted
   /// example number as a mask. Useful to later format phone numbers using a mask.
+  ///
+  /// Pass a BCP-47 locale tag such as `uk`, `uk-UA`, or `pt-BR` to localize
+  /// each [CountryWithPhoneCode.countryName]. When omitted, the platform default
+  /// locale is used.
   ///
   /// The response will be a [CountryWithPhoneCode]:
   ///
@@ -52,7 +57,9 @@ abstract class FlutterLibphonenumberPlatform extends PlatformInterface {
   ///   }
   /// }
   /// ```
-  Future<Map<String, CountryWithPhoneCode>> getAllSupportedRegions() async {
+  Future<Map<String, CountryWithPhoneCode>> getAllSupportedRegions({
+    final String? locale,
+  }) async {
     throw UnimplementedError(
       'getAllSupportedRegions() has not been implemented.',
     );
@@ -121,7 +128,8 @@ abstract class FlutterLibphonenumberPlatform extends PlatformInterface {
     final bool removeCountryCodeFromResult = false,
     final bool inputContainsCountryCode = true,
   }) {
-    final guessedCountry = country ?? CountryWithPhoneCode.getCountryDataByPhone(number);
+    final guessedCountry =
+        country ?? CountryWithPhoneCode.getCountryDataByPhone(number);
 
     if (guessedCountry == null) {
       return number;
@@ -140,7 +148,9 @@ abstract class FlutterLibphonenumberPlatform extends PlatformInterface {
     /// Take a substring of the phone code length + 2 to account for leading `+` and space between
     /// country code and the number.
     if (removeCountryCodeFromResult && inputContainsCountryCode) {
-      formatResult = formatResult.substring(guessedCountry.phoneCode.length + 2);
+      formatResult = formatResult.substring(
+        guessedCountry.phoneCode.length + 2,
+      );
     }
 
     return formatResult;
@@ -158,10 +168,7 @@ abstract class FlutterLibphonenumberPlatform extends PlatformInterface {
   }) async {
     try {
       /// Try to parse the number and get our result
-      final res = await parse(
-        phoneNumber,
-        region: country.countryCode,
-      );
+      final res = await parse(phoneNumber, region: country.countryCode);
 
       late final String formattedNumber;
       if (phoneNumberFormat == PhoneNumberFormat.international) {

@@ -1,12 +1,45 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_libphonenumber_platform_interface/src/types/country_manager.dart';
 import 'package:flutter_libphonenumber_platform_interface/src/types/country_with_phone_code.dart';
 import 'package:flutter_libphonenumber_platform_interface/src/types/input_formatter.dart';
+import 'package:flutter_libphonenumber_platform_interface/src/method_channel/flutter_libphonenumber_method_channel.dart';
 import 'package:flutter_libphonenumber_platform_interface/src/types/phone_mask.dart';
 import 'package:flutter_libphonenumber_platform_interface/src/types/phone_number_format.dart';
 import 'package:flutter_libphonenumber_platform_interface/src/types/phone_number_type.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  group('getAllSupportedRegions', () {
+    const channel = MethodChannel('com.couttsconsulting/flutter_libphonenumber');
+
+    tearDown(() {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(
+        channel,
+        null,
+      );
+    });
+
+    test('passes the requested locale to the platform channel', () async {
+      MethodCall? methodCall;
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(
+        channel,
+        (final call) async {
+          methodCall = call;
+          return <String, dynamic>{};
+        },
+      );
+
+      await MethodChannelFlutterLibphonenumber().getAllSupportedRegions(
+        locale: 'uk-UA',
+      );
+
+      expect(methodCall?.method, 'get_all_supported_regions');
+      expect(methodCall?.arguments, {'locale': 'uk-UA'});
+    });
+  });
+
   group('PhoneMask', () {
     test('UK mobile international', () {
       final mask = PhoneMask(

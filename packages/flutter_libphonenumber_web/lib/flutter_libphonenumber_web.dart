@@ -3,7 +3,8 @@ import 'dart:js_interop';
 import 'package:flutter/services.dart';
 import 'package:flutter_libphonenumber_platform_interface/flutter_libphonenumber_platform_interface.dart';
 import 'package:flutter_libphonenumber_web/src/base.dart';
-import 'package:flutter_libphonenumber_web/src/libphonenumber.dart' as phoneutil;
+import 'package:flutter_libphonenumber_web/src/libphonenumber.dart'
+    as phoneutil;
 import 'package:flutter_libphonenumber_web/src/utils.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:web/web.dart';
@@ -67,7 +68,9 @@ class FlutterLibphonenumberPlugin extends FlutterLibphonenumberPlatform {
   }
 
   @override
-  Future<Map<String, CountryWithPhoneCode>> getAllSupportedRegions() async {
+  Future<Map<String, CountryWithPhoneCode>> getAllSupportedRegions({
+    final String? locale,
+  }) async {
     await _jsLibrariesLoadingFuture;
 
     final util = phoneutil.PhoneNumberUtil.getInstance();
@@ -75,7 +78,7 @@ class FlutterLibphonenumberPlugin extends FlutterLibphonenumberPlatform {
     final res = <String, CountryWithPhoneCode>{};
 
     final displayNames = phoneutil.libPhoneNumberFlutterGetRegionDisplayNames(
-      window.navigator.language,
+      locale ?? window.navigator.language,
     );
 
     final regions = util.getSupportedRegions().toDart;
@@ -110,8 +113,12 @@ class FlutterLibphonenumberPlugin extends FlutterLibphonenumberPlatform {
           _formatNational(exampleNumberFixedLine),
           phoneCode,
         ),
-        exampleNumberMobileInternational: _formatInternational(exampleNumberMobile),
-        exampleNumberFixedLineInternational: _formatInternational(exampleNumberFixedLine),
+        exampleNumberMobileInternational: _formatInternational(
+          exampleNumberMobile,
+        ),
+        exampleNumberFixedLineInternational: _formatInternational(
+          exampleNumberFixedLine,
+        ),
         phoneMaskMobileInternational: _maskNumber(
           _formatInternational(exampleNumberMobile),
           phoneCode,

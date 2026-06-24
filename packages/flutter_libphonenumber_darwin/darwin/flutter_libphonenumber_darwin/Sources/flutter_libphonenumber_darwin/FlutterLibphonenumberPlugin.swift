@@ -30,7 +30,7 @@ public class FlutterLibphonenumberPlugin: NSObject, FlutterPlugin {
         switch(call.method) {
         case "parse": parse(call, result: result)
         case "format": format(call, result: result)
-        case "get_all_supported_regions": getAllSupportedRegions(result: result)
+        case "get_all_supported_regions": getAllSupportedRegions(call, result: result)
         default:
             result(FlutterMethodNotImplemented)
         }
@@ -39,9 +39,12 @@ public class FlutterLibphonenumberPlugin: NSObject, FlutterPlugin {
     private let kit = PhoneNumberUtility()
     
     // Get all regions and assemble their phone mask data.
-    private func getAllSupportedRegions(result: @escaping FlutterResult) {
+    private func getAllSupportedRegions(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         // Runs on a separate thread to prevent locking up the UI in flutter.
         dispQueue.async {
+            let arguments = call.arguments as? [String: Any]
+            let localeIdentifier = arguments?["locale"] as? String
+            let displayLocale = localeIdentifier.flatMap { $0.isEmpty ? nil : Locale(identifier: $0) } ?? Locale.current
             var regionsMap: [String: [String: String]] = [:]
             self.kit.allCountries().forEach { (regionCode) in
                 var itemMap: [String: String] = [:]
@@ -69,7 +72,7 @@ public class FlutterLibphonenumberPlugin: NSObject, FlutterPlugin {
                         itemMap["exampleNumberFixedLineInternational"] = formattedExampleNumberFixedLineInternational
                     }
                 }
-                if let countryName = self.countryName(from: regionCode) {
+                if let countryName = self.countryName(from: regionCode, locale: displayLocale) {
                     itemMap["countryName"] = countryName
                 }
                 
@@ -184,8 +187,8 @@ public class FlutterLibphonenumberPlugin: NSObject, FlutterPlugin {
     }
     
     // Returns country name from a given country code like 'US' or 'GB'
-    private func countryName(from countryCode: String) -> String? {
-        if let name = (Locale.current as NSLocale).displayName(forKey: .countryCode, value: countryCode) {
+    private func countryName(from countryCode: String, locale: Locale) -> String? {
+        if let name = (locale as NSLocale).displayName(forKey: .countryCode, value: countryCode) {
             // Country name was found
             return name
         } else {

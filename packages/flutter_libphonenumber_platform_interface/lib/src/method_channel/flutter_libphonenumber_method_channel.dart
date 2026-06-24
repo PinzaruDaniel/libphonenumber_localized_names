@@ -20,9 +20,15 @@ class MethodChannelFlutterLibphonenumber extends FlutterLibphonenumberPlatform {
   }
 
   @override
-  Future<Map<String, CountryWithPhoneCode>> getAllSupportedRegions() async {
+  Future<Map<String, CountryWithPhoneCode>> getAllSupportedRegions({
+    final String? locale,
+  }) async {
     final result =
-        await _channel.invokeMapMethod<String, dynamic>('get_all_supported_regions') ?? {};
+        await _channel.invokeMapMethod<String, dynamic>(
+          'get_all_supported_regions',
+          {'locale': locale},
+        ) ??
+        {};
 
     final returnMap = <String, CountryWithPhoneCode>{};
     result.forEach(
@@ -30,15 +36,21 @@ class MethodChannelFlutterLibphonenumber extends FlutterLibphonenumberPlatform {
         countryName: v['countryName'] as String? ?? '',
         phoneCode: v['phoneCode'] as String? ?? '',
         countryCode: k,
-        exampleNumberMobileNational: v['exampleNumberMobileNational'] as String? ?? '',
-        exampleNumberFixedLineNational: v['exampleNumberFixedLineNational'] as String? ?? '',
+        exampleNumberMobileNational:
+            v['exampleNumberMobileNational'] as String? ?? '',
+        exampleNumberFixedLineNational:
+            v['exampleNumberFixedLineNational'] as String? ?? '',
         phoneMaskMobileNational: v['phoneMaskMobileNational'] as String? ?? '',
-        phoneMaskFixedLineNational: v['phoneMaskFixedLineNational'] as String? ?? '',
-        exampleNumberMobileInternational: v['exampleNumberMobileInternational'] as String? ?? '',
+        phoneMaskFixedLineNational:
+            v['phoneMaskFixedLineNational'] as String? ?? '',
+        exampleNumberMobileInternational:
+            v['exampleNumberMobileInternational'] as String? ?? '',
         exampleNumberFixedLineInternational:
             v['exampleNumberFixedLineInternational'] as String? ?? '',
-        phoneMaskMobileInternational: v['phoneMaskMobileInternational'] as String? ?? '',
-        phoneMaskFixedLineInternational: v['phoneMaskFixedLineInternational'] as String? ?? '',
+        phoneMaskMobileInternational:
+            v['phoneMaskMobileInternational'] as String? ?? '',
+        phoneMaskFixedLineInternational:
+            v['phoneMaskFixedLineInternational'] as String? ?? '',
       ),
     );
     return returnMap;
