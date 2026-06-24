@@ -22,7 +22,10 @@ flutter:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_libphonenumber_platform_interface: ^2.1.0
+  flutter_libphonenumber_platform_interface:
+    git:
+      url: https://github.com/PinzaruDaniel/libphonenumber_localized_names.git
+      path: packages/flutter_libphonenumber_platform_interface
 
 dev_dependencies:
   flutter_test:
